@@ -135,3 +135,12 @@ function is_valid_upload_image($image){
   return true;
 }
 
+/**
+* 特殊文字をHTMLエンティティに変換する
+* @param str  $str 変換前文字
+* @return str 変換後文字
+*/
+function h($str) {
+ 
+  return htmlspecialchars($str, ENT_QUOTES, 'utf-8');
+}
