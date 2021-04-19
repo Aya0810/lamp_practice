@@ -34,11 +34,11 @@ $changes_to = get_post('changes_to'); // ステータス変更
 
 // 商品のステータス変更用関数を利用
 if($changes_to === 'open'){
-  // 非公開→公開
+  // 非公開→公開に変更
   update_item_status($db, $item_id, ITEM_STATUS_OPEN);
   set_message('ステータスを変更しました。');
 }else if($changes_to === 'close'){
-  // 公開→非公開
+  // 公開→非公開に変更
   update_item_status($db, $item_id, ITEM_STATUS_CLOSE);
   set_message('ステータスを変更しました。');
 }else {
