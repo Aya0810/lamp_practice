@@ -1,9 +1,12 @@
 <?php
+// 汎用関数ファイルを読み込み
 require_once MODEL_PATH . 'functions.php';
+// DBファイルを読み込み
 require_once MODEL_PATH . 'db.php';
 
 // DB利用
 
+// 商品データを読み込む
 function get_item($db, $item_id){
   $sql = "
     SELECT
@@ -22,6 +25,7 @@ function get_item($db, $item_id){
   return fetch_query($db, $sql);
 }
 
+// 公開ステータスの商品一覧を読み込む
 function get_items($db, $is_open = false){
   $sql = '
     SELECT
@@ -43,26 +47,34 @@ function get_items($db, $is_open = false){
   return fetch_all_query($db, $sql);
 }
 
+// 商品一覧から商品データを取得
 function get_all_items($db){
   return get_items($db);
 }
 
+// 公開ステータスの商品から商品データを取得
 function get_open_items($db){
   return get_items($db, true);
 }
 
+// 商品の新規登録
 function regist_item($db, $name, $price, $stock, $status, $image){
+  // 画像ファイルの名前
   $filename = get_upload_filename($image);
   if(validate_item($name, $price, $stock, $filename, $status) === false){
     return false;
   }
+  // トランザクション
   return regist_item_transaction($db, $name, $price, $stock, $status, $image, $filename);
 }
 
+// トランザクション
 function regist_item_transaction($db, $name, $price, $stock, $status, $image, $filename){
+  // トランザクション開始
   $db->beginTransaction();
   if(insert_item($db, $name, $price, $stock, $filename, $status) 
     && save_image($image, $filename)){
+    // コミット処理
     $db->commit();
     return true;
   }
@@ -71,6 +83,7 @@ function regist_item_transaction($db, $name, $price, $stock, $status, $image, $f
   
 }
 
+// 商品データの追加
 function insert_item($db, $name, $price, $stock, $filename, $status){
   $status_value = PERMITTED_ITEM_STATUSES[$status];
   $sql = "
@@ -88,6 +101,7 @@ function insert_item($db, $name, $price, $stock, $filename, $status){
   return execute_query($db, $sql);
 }
 
+// 公開ステータスの変更
 function update_item_status($db, $item_id, $status){
   $sql = "
     UPDATE
@@ -102,6 +116,7 @@ function update_item_status($db, $item_id, $status){
   return execute_query($db, $sql);
 }
 
+// 在庫数の変更
 function update_item_stock($db, $item_id, $stock){
   $sql = "
     UPDATE
@@ -116,14 +131,17 @@ function update_item_stock($db, $item_id, $stock){
   return execute_query($db, $sql);
 }
 
+// 商品の削除
 function destroy_item($db, $item_id){
   $item = get_item($db, $item_id);
   if($item === false){
     return false;
   }
+  // トランザクション開始
   $db->beginTransaction();
   if(delete_item($db, $item['item_id'])
     && delete_image($item['image'])){
+    // コミット処理
     $db->commit();
     return true;
   }
@@ -131,6 +149,7 @@ function destroy_item($db, $item_id){
   return false;
 }
 
+// DBから商品データを削除
 function delete_item($db, $item_id){
   $sql = "
     DELETE FROM
@@ -146,10 +165,12 @@ function delete_item($db, $item_id){
 
 // 非DB
 
+// 1が公開ステータス
 function is_open($item){
   return $item['status'] === 1;
 }
 
+// 登録する商品データのバリデーション
 function validate_item($name, $price, $stock, $filename, $status){
   $is_valid_item_name = is_valid_item_name($name);
   $is_valid_item_price = is_valid_item_price($price);
@@ -164,6 +185,7 @@ function validate_item($name, $price, $stock, $filename, $status){
     && $is_valid_item_status;
 }
 
+// 商品名の文字数制限（1文字以上、100文字以内）
 function is_valid_item_name($name){
   $is_valid = true;
   if(is_valid_length($name, ITEM_NAME_LENGTH_MIN, ITEM_NAME_LENGTH_MAX) === false){
@@ -173,6 +195,7 @@ function is_valid_item_name($name){
   return $is_valid;
 }
 
+// 価格のバリデーション
 function is_valid_item_price($price){
   $is_valid = true;
   if(is_positive_integer($price) === false){
@@ -182,6 +205,7 @@ function is_valid_item_price($price){
   return $is_valid;
 }
 
+// 在庫数のバリデーション
 function is_valid_item_stock($stock){
   $is_valid = true;
   if(is_positive_integer($stock) === false){
@@ -191,6 +215,7 @@ function is_valid_item_stock($stock){
   return $is_valid;
 }
 
+// 画像ファイルのバリデーシ
 function is_valid_item_filename($filename){
   $is_valid = true;
   if($filename === ''){
@@ -199,6 +224,7 @@ function is_valid_item_filename($filename){
   return $is_valid;
 }
 
+// 公開ステータスのバリデーシ
 function is_valid_item_status($status){
   $is_valid = true;
   if(isset(PERMITTED_ITEM_STATUSES[$status]) === false){

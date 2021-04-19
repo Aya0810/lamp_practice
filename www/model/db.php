@@ -16,10 +16,14 @@ function get_db_connect(){
   return $dbh;
 }
 
+// クエリを実行しその結果を配列で取得する
 function fetch_query($db, $sql, $params = array()){
   try{
+    // SQL文を実行する準備
     $statement = $db->prepare($sql);
+    // SQLを実行
     $statement->execute($params);
+    // レコードの取得
     return $statement->fetch();
   }catch(PDOException $e){
     set_error('データ取得に失敗しました。');
@@ -27,10 +31,14 @@ function fetch_query($db, $sql, $params = array()){
   return false;
 }
 
+// クエリを実行しその結果を配列で取得する
 function fetch_all_query($db, $sql, $params = array()){
   try{
+    // SQL文を実行する準備
     $statement = $db->prepare($sql);
+    // SQLを実行
     $statement->execute($params);
+    // レコードの取得(複数)
     return $statement->fetchAll();
   }catch(PDOException $e){
     set_error('データ取得に失敗しました。');
@@ -38,9 +46,12 @@ function fetch_all_query($db, $sql, $params = array()){
   return false;
 }
 
+// 
 function execute_query($db, $sql, $params = array()){
   try{
+    // SQL文を実行する準備
     $statement = $db->prepare($sql);
+    // SQLを実行
     return $statement->execute($params);
   }catch(PDOException $e){
     set_error('更新に失敗しました。');
