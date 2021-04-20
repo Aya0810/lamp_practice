@@ -4,7 +4,7 @@ require_once MODEL_PATH . 'functions.php';
 // DBファイルを読み込み
 require_once MODEL_PATH . 'db.php';
 
-// ログインユーザーのカートデータを読み込み
+// ログインユーザーのカートデータを読み込む
 function get_user_carts($db, $user_id){
   $sql = "
     SELECT
@@ -29,7 +29,7 @@ function get_user_carts($db, $user_id){
   return fetch_all_query($db, $sql);
 }
 
-// カートに追加するために必要なデータを読み込む
+// カートに追加するために必要なデータを読み込む（同一ユーザー、同一商品）
 function get_user_cart($db, $user_id, $item_id){
   $sql = "
     SELECT

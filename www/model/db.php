@@ -31,14 +31,14 @@ function fetch_query($db, $sql, $params = array()){
   return false;
 }
 
-// クエリを実行しその結果を配列で取得する
+// クエリを実行しその結果を全件まとめて配列で取得する
 function fetch_all_query($db, $sql, $params = array()){
   try{
     // SQL文を実行する準備
     $statement = $db->prepare($sql);
     // SQLを実行
     $statement->execute($params);
-    // レコードの取得(複数)
+    // レコードの取得(すべて)
     return $statement->fetchAll();
   }catch(PDOException $e){
     set_error('データ取得に失敗しました。');
@@ -46,7 +46,7 @@ function fetch_all_query($db, $sql, $params = array()){
   return false;
 }
 
-// 
+// クエリを実行
 function execute_query($db, $sql, $params = array()){
   try{
     // SQL文を実行する準備
