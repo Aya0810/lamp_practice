@@ -15,11 +15,11 @@ function get_user($db, $user_id){
     FROM
       users
     WHERE
-      user_id = {$user_id}
+      user_id = ?
     LIMIT 1
   ";
 
-  return fetch_query($db, $sql);
+  return fetch_query($db, $sql, array($user_id));
 }
 
 // ユーザー名が一致するユーザーのデータを読み込む
@@ -33,11 +33,11 @@ function get_user_by_name($db, $name){
     FROM
       users
     WHERE
-      name = '{$name}'
+      name = ?
     LIMIT 1
   ";
 
-  return fetch_query($db, $sql);
+  return fetch_query($db, $sql, array($name));
 }
 
 // ログイン処理
