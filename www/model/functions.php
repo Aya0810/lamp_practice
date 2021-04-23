@@ -53,7 +53,7 @@ function set_session($name, $value){
   $_SESSION[$name] = $value;
 }
 
-// エラーメッセージのセッションデータ
+// エラーメッセージの設定
 function set_error($error){
   $_SESSION['__errors'][] = $error;
 }
@@ -62,7 +62,6 @@ function get_errors(){
   // errorsをセッションエラーと定義する
   $errors = get_session('__errors');
   if($errors === ''){
-    // 
     return array();
   }
   set_session('__errors',  array());
@@ -74,11 +73,11 @@ function has_error(){
   return isset($_SESSION['__errors']) && count($_SESSION['__errors']) !== 0;
 }
 
-// 完了メッセージのセッションデータ
+// 完了メッセージの設定
 function set_message($message){
   $_SESSION['__messages'][] = $message;
 }
-// 
+// 完了メッセージを取得
 function get_messages(){
   $messages = get_session('__messages');
   if($messages === ''){
