@@ -26,6 +26,13 @@ $user = get_login_user($db);
 
 // POSTされたものを定義
 $item_id = get_post('item_id'); // 商品ID
+$token = get_post('token');       // トークン
+
+// トークンチェック用関数を利用
+if (is_valid_csrf_token($token) === false){
+  set_error('不正なアクセスが行われました。');
+  redirect_to(HOME_URL);
+}
 
 // カートに商品追加用関数を利用
 if(add_cart($db,$user['user_id'], $item_id)){

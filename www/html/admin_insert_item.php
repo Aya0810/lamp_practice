@@ -33,8 +33,15 @@ $name = get_post('name');     // 商品ID
 $price = get_post('price');   // 値段
 $status = get_post('status'); // ステータス
 $stock = get_post('stock');   // 在庫数
+$token = get_post('token');       // トークン
 // ファイルから画像を読み込む
 $image = get_file('image');
+
+// トークンチェック用関数を利用
+if (is_valid_csrf_token($token) === false){
+  set_error('不正なアクセスが行われました。');
+  redirect_to(ADMIN_URL);
+}
 
 // 商品の追加用関数を利用
 if(regist_item($db, $name, $price, $stock, $status, $image)){
