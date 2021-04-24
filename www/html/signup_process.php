@@ -15,13 +15,20 @@ if(is_logined() === true){
   redirect_to(HOME_URL);
 }
 
+// PDOを取得
+$db = get_db_connect();
+
 // POSTされたものを定義
 $name = get_post('name'); // ユーザー名
 $password = get_post('password'); // パスワード
 $password_confirmation = get_post('password_confirmation'); // 確認用パスワード
+$token = get_post('token');       // トークン
 
-// PDOを取得
-$db = get_db_connect();
+// トークンチェック用関数を利用
+if (is_valid_csrf_token($token) === false){
+  set_error('不正なアクセスが行われました。');
+  redirect_to(SIGNUP_URL);
+}
 
 // ユーザー登録処理用関数を利用
 try{

@@ -31,6 +31,13 @@ if(is_admin($user) === false){
 // POSTされたものを定義
 $item_id = get_post('item_id');       // 商品ID
 $changes_to = get_post('changes_to'); // ステータス変更
+$token = get_post('token');       // トークン
+
+// トークンチェック用関数を利用
+if (is_valid_csrf_token($token) === false){
+  set_error('不正なアクセスが行われました。');
+  redirect_to(ADMIN_URL);
+}
 
 // 商品のステータス変更用関数を利用
 if($changes_to === 'open'){
