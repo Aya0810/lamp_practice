@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- ホスト: mysql
--- 生成日時: 2021 年 4 月 26 日 10:55
+-- 生成日時: 2021 年 4 月 28 日 07:22
 -- サーバのバージョン： 5.7.33
 -- PHP のバージョン: 7.4.16
 
@@ -28,6 +28,7 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `details` (
+  `datail_id` int(11) NOT NULL,
   `order_id` int(11) NOT NULL,
   `item_id` int(11) NOT NULL,
   `amount` int(11) NOT NULL,
@@ -55,6 +56,7 @@ CREATE TABLE `histories` (
 -- テーブルのインデックス `details`
 --
 ALTER TABLE `details`
+  ADD PRIMARY KEY (`datail_id`),
   ADD KEY `item_id` (`item_id`),
   ADD KEY `order_id` (`order_id`);
 
@@ -70,10 +72,16 @@ ALTER TABLE `histories`
 --
 
 --
+-- テーブルの AUTO_INCREMENT `details`
+--
+ALTER TABLE `details`
+  MODIFY `datail_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
 -- テーブルの AUTO_INCREMENT `histories`
 --
 ALTER TABLE `histories`
-  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- ダンプしたテーブルの制約
