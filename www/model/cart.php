@@ -53,7 +53,6 @@ function get_user_cart($db, $user_id, $item_id){
     AND
       items.item_id = ?
   ";
-
   return fetch_query($db, $sql, array($user_id, $item_id));
 
 }
@@ -66,6 +65,7 @@ function add_cart($db, $user_id, $item_id ) {
   }
   return update_cart_amount($db, $cart['cart_id'], $cart['amount'] + 1);
 }
+
 // 新しくデータを追加
 function insert_cart($db, $user_id, $item_id, $amount = 1){
   $sql = "
@@ -103,7 +103,6 @@ function delete_cart($db, $cart_id){
       cart_id = ?
     LIMIT 1
   ";
-
   return execute_query($db, $sql, array($cart_id));
 }
 
@@ -112,19 +111,74 @@ function purchase_carts($db, $carts){
   if(validate_cart_purchase($carts) === false){
     return false;
   }
-  // 購入後、カートの中身削除＆在庫変動
-  foreach($carts as $cart){
-    // 在庫変動
-    if(update_item_stock(
-        $db, 
-        $cart['item_id'], 
-        $cart['stock'] - $cart['amount']
-      ) === false){
-      set_error($cart['name'] . 'の購入に失敗しました。');
+  // 購入後、カートの中身削除＆在庫変動＆購入履歴・明細にデータを挿入
+  // トランザクション開始
+  $db->beginTransaction();
+    // 購入履歴
+    if (insert_history($db, $carts[0]['user_id']) === false) {
+      // ロールバック
+      $db->rollback();
+      return false;
     }
+    // 登録したデータのIDを取得
+    $order_id = $db->lastInsertId('order_id');
+    foreach($carts as $cart){
+      // 購入明細
+      if (insert_detail($db, $order_id, $cart['item_id'], $cart['amount'], $cart['price']) === false) {
+        // ロールバック
+        $db->rollback();
+        return false;
+      }
+      // 在庫変動
+      if(update_item_stock(
+          $db, 
+          $cart['item_id'], 
+          $cart['stock'] - $cart['amount']
+        ) === false){
+        // ロールバック
+        $db->rollback();
+        set_error($cart['name'] . 'の購入に失敗しました。');
+        return false;
+      }
+    }
+    // カートの削除
+    if (delete_user_carts($db, $carts[0]['user_id']) === false) {
+    // ロールバック
+    $db->rollback();
+    return false;
   }
-  delete_user_carts($db, $carts[0]['user_id']);
+  // コミット処理
+  $db->commit();
+  return true;
 }
+
+// 購入履歴にデータを挿入
+function insert_history($db, $user_id){
+  $sql = "
+    INSERT INTO
+    histories(
+        user_id
+      )
+    VALUES(?)
+  ";  
+  return execute_query($db, $sql, array($user_id));  
+}
+
+// 購入明細にデータを挿入
+function insert_detail($db, $order_id, $item_id, $amount, $price){
+  $sql = "
+    INSERT INTO
+    details(
+        order_id,
+        item_id,
+        amount,
+        price
+      )
+    VALUES(?, ?, ?, ?)
+  ";  
+  return execute_query($db, $sql, array($order_id, $item_id, $amount, $price));  
+}
+
 // カートの中身を一括削除する
 function delete_user_carts($db, $user_id){
   $sql = "
@@ -133,7 +187,6 @@ function delete_user_carts($db, $user_id){
     WHERE
       user_id = ?
   ";
-
   execute_query($db, $sql, array($user_id));
 }
 

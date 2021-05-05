@@ -68,7 +68,7 @@ function regist_item($db, $name, $price, $stock, $status, $image){
   return regist_item_transaction($db, $name, $price, $stock, $status, $image, $filename);
 }
 
-// トランザクション
+// トランザクション処理
 function regist_item_transaction($db, $name, $price, $stock, $status, $image, $filename){
   // トランザクション開始
   $db->beginTransaction();
@@ -78,9 +78,9 @@ function regist_item_transaction($db, $name, $price, $stock, $status, $image, $f
     $db->commit();
     return true;
   }
+  // ロールバック
   $db->rollback();
   return false;
-  
 }
 
 // 商品データの追加
@@ -145,6 +145,7 @@ function destroy_item($db, $item_id){
     $db->commit();
     return true;
   }
+  // ロールバック
   $db->rollback();
   return false;
 }
